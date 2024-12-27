@@ -1,0 +1,40 @@
+name: Validate Commit Messages
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  validate-commit-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Debugging Info
+        run: |
+          echo "Commit range: ${{ github.event.before }}..${{ github.sha }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Before: ${{ github.event.before }}"
+
+      - name: Validate commit messages
+        run: |
+          for COMMIT in $(git rev-list ${{ github.event.before }}..${{ github.sha }}); do
+            echo "Checking commit: $COMMIT"
+            MESSAGE=$(git log --format=%B -n 1 $COMMIT)
+            echo "Commit message: $MESSAGE"
+
+            if git log --format=%B -n 1 $COMMIT | grep -qE '^Merge'; then
+              echo "Skipping merge commit"
+              continue
+            fi
+
+            if ! echo "$MESSAGE" | grep -qE '^[A-Z]+-[0-9]+ .+'; then
+              echo "Invalid commit message: $MESSAGE"
+              exit 1
+            fi
+          done
+          echo "All commit messages are valid."
