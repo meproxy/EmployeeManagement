@@ -17,4 +17,6 @@ public class Salary {
 
     private int fixed;
 
+    private int reumbusment;
+
 }
