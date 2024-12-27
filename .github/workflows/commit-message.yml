@@ -1,0 +1,26 @@
+name: Validate Commit Messages
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  validate-commit-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Validate commit messages
+        run: |
+          for COMMIT in $(git rev-list ${{ github.event.before }}..${{ github.sha }}); do
+            MESSAGE=$(git log --format=%B -n 1 $COMMIT)
+            if [[ ! $MESSAGE =~ ^[A-Z]+-[0-9]+ ]]; then
+              echo "Invalid commit message: $MESSAGE"
+              echo "Commit messages must start with an issue key (e.g., TJ-123 Description...)"
+              exit 1
+            fi
+          done
