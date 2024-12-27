@@ -13,4 +13,6 @@ import lombok.Setter;
 @Entity
 public class Salary {
 
+    private int varaible;
+
 }
