@@ -15,4 +15,6 @@ public class Salary {
 
     private int varaible;
 
+    private int fixed;
+
 }
